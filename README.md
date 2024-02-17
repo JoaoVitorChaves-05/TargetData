@@ -20,4 +20,4 @@ Esta é uma API Flask que se integra ao MongoDB para armazenamento de dados de u
 
 ## Uso
 
-* Acesse a documentação da API em http://localhost:5000/docs para visualizar e testar os endpoints.
+* Acesse a documentação da API em http://127.0.0.1:5000/docs para visualizar e testar os endpoints.
