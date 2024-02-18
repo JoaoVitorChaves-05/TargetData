@@ -19,9 +19,9 @@ load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-es = Elasticsearch(['http://127.0.0.1:9200/'])
+es = Elasticsearch(['http://localhost:9200/'])
 
-client = MongoClient("mongodb://127.0.0.1:27017/")
+client = MongoClient("mongodb://localhost:27017/")
 db = client["target_data"]
 users = db["users"]
 
@@ -29,7 +29,7 @@ def createToken(user_id):
     # Definir payload do token
     payload = {
         'user_id': user_id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=720)  # Token expira em 720 horas
+        'exp': datetime.datetime.now() + datetime.timedelta(hours=720)  # Token expira em 720 horas
     }
     # Gerar token JWT
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
@@ -200,10 +200,11 @@ def logsRoute():
     
 @app.route('/api/docs')
 def docs():
+    print("foi")
     return send_from_directory('.', 'swagger.yaml')
     
 SWAGGER_URL = '/docs'
-API_URL = 'http://127.0.0.1:5000/api/docs'
+API_URL = 'http://localhost:5000/api/docs'
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
@@ -216,4 +217,4 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 app.register_blueprint(swaggerui_blueprint)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
