@@ -6,14 +6,19 @@ services:
     container_name: mongodb
     ports:
       - "27017:27017"
+    networks:
+      - myNetwork
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
+      - network.host=0.0.0.0
     ports:
       - "9200:9200"
+    networks:
+      - myNetwork
 
   api:
     build: .
@@ -23,3 +28,9 @@ services:
     depends_on:
       - mongodb
       - elasticsearch
+    networks:
+      - myNetwork
+    restart: on-failure
+networks:
+  myNetwork:
+    driver: bridge

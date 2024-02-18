@@ -8,5 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 EXPOSE 5000
+EXPOSE 27017
+EXPOSE 9200
 
 CMD ["python", "index.py"]

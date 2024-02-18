@@ -19,9 +19,9 @@ load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-es = Elasticsearch(['http://localhost:9200/'])
+es = Elasticsearch(['http://elasticsearch:9200'])
 
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient("mongodb://mongodb:27017/")
 db = client["target_data"]
 users = db["users"]
 
@@ -46,7 +46,7 @@ def verifyToken(token):
     except jwt.InvalidTokenError:
         # Token inválido
         return { "status": False, "message": 'Token inválido. Faça login novamente.'}
-
+    
 def generateLog(index_name, user_id, level, message):
     log_message = {
         '@timestamp': datetime.datetime.now().isoformat(),
@@ -64,10 +64,12 @@ def generateLog(index_name, user_id, level, message):
 @app.route('/user', methods=['GET', 'POST'])
 def userRoute():
     if (request.method == 'POST'):
+        print('INICIO POST')
         user = request.form['user']
 
         if (not user):
             return jsonify({"status": False, "message": "Nome de usário não enviado."}), 401
+        
 
         password = request.form['password']
 
@@ -76,7 +78,9 @@ def userRoute():
         
         password_bytes = password.encode('utf-8')
         password_hash = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        print('ANTES DE CRIAR O USER')
         user_created = db.users.insert_one({"user": user, "password_hash": password_hash})
+        print('TESTE', user_created)
         generateLog('logs', user_created.inserted_id, 'INFO', f'{str(user_created.inserted_id)} se cadastrou às {datetime.datetime.now().isoformat()}.')
         return jsonify({"status": True, "message": 'ID do usuário inserido:' + str(user_created.inserted_id)}), 201
 
