@@ -57,14 +57,11 @@ def generateLog(index_name, user_id, level, message):
 
     res = es.index(index=index_name, body=log_message)
 
-    print(res['result'])
-
     return True
 
 @app.route('/user', methods=['GET', 'POST'])
 def userRoute():
     if (request.method == 'POST'):
-        print('INICIO POST')
         user = request.form['user']
 
         if (not user):
@@ -78,13 +75,11 @@ def userRoute():
         
         password_bytes = password.encode('utf-8')
         password_hash = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
-        print('ANTES DE CRIAR O USER')
         user_created = db.users.insert_one({"user": user, "password_hash": password_hash})
-        print('TESTE', user_created)
         generateLog('logs', user_created.inserted_id, 'INFO', f'{str(user_created.inserted_id)} se cadastrou às {datetime.datetime.now().isoformat()}.')
         return jsonify({"status": True, "message": 'ID do usuário inserido:' + str(user_created.inserted_id)}), 201
 
-@app.route('/token', methods=['GET', 'POST'])
+@app.route('/token', methods=['POST'])
 def tokenRoute():
     if (request.method == 'POST'):
         user = request.form['user']
@@ -110,7 +105,7 @@ def tokenRoute():
             return jsonify({"token": token, "status": True}), 200
         return jsonify({"status": False, "message": "Credenciais inválidas."}), 401
 
-@app.route('/cep', methods=['GET', 'POST'])
+@app.route('/cep', methods=['POST'])
 def cepRoute():
     if (request.method == 'POST'):
         result_token = verifyToken(request.form['token'])
@@ -204,7 +199,6 @@ def logsRoute():
     
 @app.route('/api/docs')
 def docs():
-    print("foi")
     return send_from_directory('.', 'swagger.yaml')
     
 SWAGGER_URL = '/docs'
